@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>(a)mazing</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <h1>(a)mazing</h1>
+  <p>
+    &larr; &uarr; &darr; &rarr; : move your character&nbsp;&nbsp;&nbsp;&nbsp;h : yell for help
+  </p>
+  <pre id="surface"></pre>
+  <p>
+    credits: <a href="https://iut-info.univ-reims.fr/users/coutant/Creation_Resolution_Labyrinthe_Sujet.html"
+      target="_blank">etienne coutant</a>
+  </p>
+
+  <script src="js/maze.class.js"></script>
+  <script src="js/map.class.js"></script>
+  <script src="js/entity.class.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      let maze, map, player;
+      let col = 5;
+      let row = 5;
+
+      function generateMaze(c, r) {
+        maze = new Maze(c, r);
+        //maze.binaryTree();
+        //maze.sideWinder();
+        maze.backTracker();
+
+        map = new NiceMap(maze)
+        map.setCellContent(c, r, '&blk14;');
+
+        player = new Player(maze, map);
+        player.draw();
+      }
+
+      generateMaze(col, row);
+
+      let surface = document.querySelector('#surface');
+      map.draw(surface);
+
+      document.addEventListener('keydown', (event) => {
+        switch (event.key) {
+          case 'ArrowUp':
+            player.move('N');
+            break;
+          case 'ArrowRight':
+            player.move('E');
+            break;
+          case 'ArrowDown':
+            player.move('S');
+            break;
+          case 'ArrowLeft':
+            player.move('W');
+            break;
+          case 'h':
+            maze.computePathTo(player.x, player.y).forEach(point => map.setCellContent(point.x, point.y, '<span class="pebble">.</span>'));
+            map.setCellContent(maze.col, maze.row, '&blk14;');
+        }
+
+        if (player.x === maze.col && player.y === maze.row) {
+          if (col < 20) { col *= 2; row *= 2; }
+          generateMaze(col, row);
+        }
+
+        map.draw(surface);
+      });
+    });
+
+
+  </script>
+</body>
+
+</html>
